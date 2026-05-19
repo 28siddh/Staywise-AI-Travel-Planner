@@ -1,0 +1,84 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+  body { background-color: #f8f9fa; }
+  .dashboard-header { margin: 40px 0 30px; }
+  .dashboard-header h1 { font-size: 2rem; font-weight: 700; color: #222; }
+  .dashboard-header p { color: #717171; font-size: 1.1rem; }
+  
+  .trip-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; margin-bottom: 60px; }
+  
+  .trip-card {
+    background: white;
+    border: 1px solid #dddddd;
+    border-radius: 16px;
+    padding: 24px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .trip-card:hover { transform: translateY(-4px); box-shadow: 0 12px 24px rgba(0,0,0,0.08); }
+  
+  .trip-title { font-size: 1.25rem; font-weight: 700; color: #222; margin-bottom: 8px; text-transform: capitalize; }
+  .trip-date { font-size: 0.85rem; color: #717171; margin-bottom: 16px; font-weight: 500; }
+  
+  .trip-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+  .trip-tag { background: #f1f1f1; color: #222; padding: 4px 10px; border-radius: 12px; font-size: 0.8rem; font-weight: 600; }
+  
+  .trip-overview { color: #444; font-size: 0.9rem; line-height: 1.5; margin-bottom: 24px; flex-grow: 1; }
+  
+  .btn-view {
+    background: white;
+    color: #222;
+    border: 1px solid #222;
+    border-radius: 8px;
+    padding: 10px;
+    text-align: center;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+  .btn-view:hover { background: #222; color: white; text-decoration: none; }
+  
+  .empty-state { text-align: center; padding: 80px 20px; background: white; border-radius: 16px; border: 1px solid #ddd; }
+  .empty-state h3 { font-weight: 700; color: #222; }
+  .btn-primary-custom { background: #fe424d; color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; text-decoration: none; display: inline-block; margin-top: 16px; }
+  .btn-primary-custom:hover { background: #e0313b; color: white; }
+</style>
+
+<div class="container">
+  <div class="dashboard-header">
+    <h1>✈️ My Saved Trips</h1>
+    <p>All your AI-generated travel plans in one place.</p>
+  </div>
+
+  <% if (trips && trips.length > 0) { %>
+    <div class="trip-grid">
+      <% trips.forEach(trip => { %>
+        <div class="trip-card">
+          <div class="trip-title"><%= trip.location %> Getaway</div>
+          <div class="trip-date">Generated on <%= trip.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) %></div>
+          
+          <div class="trip-tags">
+            <span class="trip-tag">📅 <%= trip.days %> Days</span>
+            <span class="trip-tag">💰 Rs.<%= trip.budget.toLocaleString() %></span>
+            <span class="trip-tag">🎒 <%= trip.style %></span>
+          </div>
+          
+          <div class="trip-overview">
+            <%= trip.tripData && trip.tripData.overview ? trip.tripData.overview.substring(0, 100) + '...' : 'Your custom itinerary.' %>
+          </div>
+          
+          <a href="/itinerary" class="btn-view">Plan Another Trip</a>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div class="empty-state">
+      <h3>No trips planned yet!</h3>
+      <p style="color: #717171; margin-top: 8px;">Time to start exploring the world.</p>
+      <a href="/itinerary" class="btn-primary-custom">Plan a Trip Now</a>
+    </div>
+  <% } %>
+</div>
