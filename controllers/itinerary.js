@@ -1,6 +1,6 @@
 const Listing = require("../models/listing");
 const https = require("https");
-const Trip = require("../models/trip"); // Add this near the top with your Listing require
+const Trip = require("../models/trip"); 
 
 module.exports.renderItinerary = (req, res) => {
     res.render("itinerary.ejs");
@@ -135,5 +135,30 @@ module.exports.renderMyTrips = async (req, res) => {
         console.error("Error fetching trips:", err);
         req.flash("error", "Could not load your saved trips.");
         res.redirect("/listings");
+    }
+};
+
+// NEW: Show a single saved trip
+module.exports.showTrip = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const trip = await Trip.findById(id);
+        
+        if (!trip) {
+            req.flash("error", "Cannot find that trip!");
+            return res.redirect("/itinerary/my-trips");
+        }
+
+        // Security check: Only the owner can view this trip
+        if (req.user && !trip.owner.equals(req.user._id)) {
+            req.flash("error", "You do not have permission to view this trip.");
+            return res.redirect("/itinerary/my-trips");
+        }
+        
+        res.render("itinerary/show.ejs", { trip }); 
+    } catch (err) {
+        console.error("Error fetching specific trip:", err);
+        req.flash("error", "Something went wrong loading the trip.");
+        res.redirect("/itinerary/my-trips");
     }
 };
